@@ -180,7 +180,7 @@ public class MutationFinder extends MutationExtractor {
     * manner should be followed by the string '[CASE_SENSITIVE]', with no spaces between it and the regular expression.
     */
     private void loadRegularExpressionsFromJar(String file) {
-        System.out.println("Loading regular expressions from Java Archive at location '" +file +"'");
+        System.err.println("Loading regular expressions from Java Archive at location '" +file +"'");
         InputStream is = this.getClass().getResourceAsStream(file);
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         try{
