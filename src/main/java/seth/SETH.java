@@ -74,13 +74,16 @@ public class SETH {
         this.mf = new MutationFinder(regexFile);
         this.seth = new SETHNER(exactGrammar);
         this.snpRecognizer = new dbSNPRecognizer();
+        this.bl = (oldNomenclature) ? new OldNomenclature() : null;
+    }
 
-        if (oldNomenclature)
-            this.bl = new OldNomenclature();
-        else
-            this.bl = null;
+    public SETH(MutationFinder mf, boolean exactGrammar, boolean oldNomenclature) {
+        super();
 
-
+        this.mf = mf;
+        this.seth = new SETHNER(exactGrammar);
+        this.snpRecognizer = new dbSNPRecognizer();
+        this.bl = (oldNomenclature) ? new OldNomenclature() : null;
     }
 
     public List<MutationMention> findMutationsWithMutationFinder(String text) {

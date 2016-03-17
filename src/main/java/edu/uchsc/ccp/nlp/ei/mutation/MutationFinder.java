@@ -16,13 +16,13 @@ import org.apache.oro.text.regex.Perl5Compiler;
 import org.apache.oro.text.regex.Perl5Matcher;
 
 /**
- * 
+ *
  * This is the Java implementation of MutationFinder (original version in Python by J. Gregory Caporaso). <br>
- * 
+ *
  * @author William A. Baumgartner, Jr. <br>
  *         william.baumgartner@uchsc.edu
  * @version 1.0
- * 
+ *
  */
 
 /*
@@ -52,7 +52,7 @@ public class MutationFinder extends MutationExtractor {
      * (i.e., perl regular expressions), with the single exception being that regular expressions which should be performed in a case sensitive manner
      * should be followed by the string '[CASE_SENSITIVE]', with no spaces between it and the regular expression. This can be a list, a file, or any
      * other object which supports iteration. For an example, you should refer to the regex.txt file in the MutationFinder directory.
-     * 
+     *
      * Since Java does not implement "named groups", we must process the Python regular expressions and store a mapping of the three components of a
      * point mutation to the groups that they are members of. These mappings are stored in the Map<String, Integer>, where the String is one of
      * MUT_RES, WT_RES, or POS, and the Integer represents its parenthetical group.
@@ -69,11 +69,18 @@ public class MutationFinder extends MutationExtractor {
         initializeAmbiguousMentions();
     }
 
+    public static MutationFinder useOriginalRegex() {
+      MutationFinder ret = new MutationFinder(new HashSet<String>());
+      ret.loadRegularExpressionsFromJar("/resources/mutationfinder/origDist/regex.txt");
+      ret.initializeAmbiguousMentions();
+      return ret;
+    }
+
     /**
      * Initialization of MutationFinder requires a set of regular expressions that will be used to detect mutations. This constructor loads the
      * regular expressions from a file designated by the filename input parameter.<br>
      * <br>
-     * 
+     *
      * @param fileName
      *            Since the original development of MutationFinder was conducted in Python, the input file contains regular expressions that are
      *            Python-specific (due to the fact that that Java does not handle explicitly named groups). These regular expressions must therefore
@@ -89,7 +96,7 @@ public class MutationFinder extends MutationExtractor {
      * Initialization of MutationFinder requires a set of regular expressions that will be used to detect mutations. This constructor loads the
      * regular expressions from a file designated by the Java File input parameter.<br>
      * <br>
-     * 
+     *
      * @param file
      *            Since the original development of MutationFinder was conducted in Python, the input file contains regular expressions that are
      *            Python-specific (due to the fact that that Java does not handle explicitly named groups). These regular expressions must therefore
@@ -103,7 +110,7 @@ public class MutationFinder extends MutationExtractor {
      * Initialization of MutationFinder requires a set of regular expressions that will be used to detect mutations. This constructor loads the
      * regular expressions from a Set of Strings representing the regular expressions.<br>
      * <br>
-     * 
+     *
      * @param unprocessed_python_regexes
      *            Since the original development of MutationFinder was conducted in Python, the set of regular expressions used is Python-specific in
      *            that Java does not handle explicitly named groups. These regular expressions must therefore be converted prior to use in the Java
@@ -326,17 +333,17 @@ public class MutationFinder extends MutationExtractor {
 
     /**
      * Extract point mutations mentions from raw_text and return them in a map.
-     * 
+     *
      * The result of this method is a mapping of PointMutation objects to a set of spans (int arrays of size 2) where they were identified. Spans are
-     * presented in the form of character-offsets in text. 
-     * 
+     * presented in the form of character-offsets in text.
+     *
      * Example result: <br>
      * raw_text: 'We constructed A42G and L22G, and crystalized A42G.' <br>
      * result = {PointMutation(42,'A','G'):[(15,19),(46,50)], <br>
      * PointMutation(22,'L','G'):[(24,28)]}<br>
-     * 
+     *
      * Note that the spans won't necessarily be in increasing order, due to the order of processing regular expressions.
-     * 
+     *
      * @param rawText
      *            the text to be processed
      * @return
@@ -356,11 +363,11 @@ public class MutationFinder extends MutationExtractor {
             int pos_group = groupMappings.get(POS);
             int wtres_group = groupMappings.get(WT_RES);
             int mutres_group = groupMappings.get(MUT_RES);
-            
-            /* create a new PointMutation for each match */            
+
+            /* create a new PointMutation for each match */
             while (m.contains(input, pattern.getPattern())) {
             	int id = pattern.getId();
-            	
+
                 MatchResult result = m.getMatch();
 //                System.out.println(result.group(pos_group) +" " +result.group(wtres_group) +" " +result
 //                        .group(mutres_group));
@@ -378,7 +385,7 @@ public class MutationFinder extends MutationExtractor {
                         continue;
 
 	                pm.setId(id);
-	                
+
 	                // /*
 	                // * The span of the mutation is calculated as the min # start span of the three components and the max end span # of the three
 	                // * components -- these are then packed up as an int array of size 2.
@@ -388,7 +395,7 @@ public class MutationFinder extends MutationExtractor {
 	                span[0] = Math.min(result.beginOffset(pos_group), Math.min(result.beginOffset(wtres_group), result
 	                        .beginOffset(mutres_group)));
 	                span[1] = Math.max(result.endOffset(pos_group), Math.max(result.endOffset(wtres_group), result.endOffset(mutres_group)));
-	
+
 	                /* now store the mutation and the span */
 	                if (extractedMutations.containsKey(pm)) {
 	                    extractedMutations.get(pm).add(span);
@@ -420,7 +427,7 @@ public class MutationFinder extends MutationExtractor {
      * The output file will contain the mutations found for each document (one document per line) where each line takes the format:<br>
      * <br>
      * documentID<tab>mutation<tab>mutation<tab>mutation...<br>
-     * 
+     *
      * @param args
      *            args[0] - the regular expression file<br>
      *            args[1] - the input file containing text to process<br>
