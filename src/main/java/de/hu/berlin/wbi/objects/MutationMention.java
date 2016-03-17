@@ -1167,6 +1167,11 @@ public class MutationMention {
                 + ", type=" + getType() + ", tool=" + getTool() + "]";
     }
 
+    public String toBratFormat() {
+      String id = "T"+location.getStart(); //arbitrary, it works because of no overlapping entities
+      return id+"\tmutation "+location.getStart()+" "+location.getStop()+"\t"+text;
+    }
+
     /**
      * @return SNP-description following the <wt><aa><mt> nomenclature
      */
