@@ -83,6 +83,41 @@ public class SETH {
 
     }
 
+    public List<MutationMention> findMutationsWithMutationFinder(String text) {
+      List<MutationMention> mutations = new ArrayList<MutationMention>();
+
+      try {
+          Map<edu.uchsc.ccp.nlp.ei.mutation.Mutation, Set<int[]>> map = mf.extractMutations(text);
+
+          for (edu.uchsc.ccp.nlp.ei.mutation.Mutation mutation : map.keySet()) {
+              PointMutation pm = (PointMutation) mutation;
+
+              for (int[] location : map.get(mutation)) {
+                  String originalMatch = text.substring(location[0], location[1]);
+
+                  // MutationFinder only returns protein matches
+                  MutationMention tmpMutation = new MutationMention(location[0], location[1], originalMatch, null, pm.getPosition(),
+                          String.valueOf(pm.getWtResidue()), String.valueOf(pm.getMutResidue()),
+                          Type.SUBSTITUTION, MutationMention.Tool.MUTATIONFINDER);
+                  tmpMutation.setPatternId(pm.getId());
+                  if (pm.isMatchesLongForm()) {
+                      tmpMutation.setPsm(true);
+                      tmpMutation.setAmbiguous(false);
+                      tmpMutation.setNsm(false);
+                  }
+
+                  mutations.add(tmpMutation);
+              }
+          }
+
+      } catch (MutationException e) {
+          e.printStackTrace();
+          System.exit(1);
+      }
+
+      return mutations;
+    }
+
     /**
      * Searches for mutation mentions in applied text and returns them
      *
@@ -99,39 +134,12 @@ public class SETH {
         mutations.addAll(snpRecognizer.extractMutations(text));
 
         //Extracts variations following different Nomenclature forms
-        if (bl != null)
+        if (bl != null) {
             mutations.addAll(bl.extractMutations(text));
-
-        //Extract mutations, using a modified version of MutationFinder
-        try {
-            Map<edu.uchsc.ccp.nlp.ei.mutation.Mutation, Set<int[]>> map = mf.extractMutations(text);
-
-            for (edu.uchsc.ccp.nlp.ei.mutation.Mutation mutation : map.keySet()) {
-                PointMutation pm = (PointMutation) mutation;
-
-                for (int[] location : map.get(mutation)) {
-                    String originalMatch = text.substring(location[0], location[1]);
-
-                    // MutationFinder only returns protein matches
-                    MutationMention tmpMutation = new MutationMention(location[0], location[1], originalMatch, null, pm.getPosition(),
-                            String.valueOf(pm.getWtResidue()), String.valueOf(pm.getMutResidue()),
-                            Type.SUBSTITUTION, MutationMention.Tool.MUTATIONFINDER);
-                    tmpMutation.setPatternId(pm.getId());
-                    if (pm.isMatchesLongForm()) {
-                        tmpMutation.setPsm(true);
-                        tmpMutation.setAmbiguous(false);
-                        tmpMutation.setNsm(false);
-                    }
-
-                    mutations.add(tmpMutation);
-                }
-            }
-
-        } catch (MutationException e) {
-            e.printStackTrace();
-            System.exit(1);
         }
 
+        //Extract mutations, using a modified version of MutationFinder
+        mutations.addAll(this.findMutationsWithMutationFinder(text));
 
         //Post-processing:
         //Some mentions can be found be different tools. Thus, we remove all duplicates by preserving the longest element
