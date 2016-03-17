@@ -210,7 +210,7 @@ public class MutationMention {
                 if(normalizePSMSimpleHGVS(candidate)) {
                     EnumSet<MatchOptions> match = EnumSet.of(
                         MatchOptions.LOC, MatchOptions.PSM
-                    );                    
+                    );
                     normalized.add(new dbSNPNormalized(candidate, match, null));
                 }
 
@@ -227,7 +227,7 @@ public class MutationMention {
                     normalized.add(new dbSNPNormalized(candidate, match, null));
                 }
 
-                if(normalizePSMMethionineSwapHGVS(candidate)) {                    
+                if(normalizePSMMethionineSwapHGVS(candidate)) {
                     EnumSet<MatchOptions> match = EnumSet.of(MatchOptions.METHIONE, MatchOptions.PSM, MatchOptions.SWAPPED);
                     normalized.add(new dbSNPNormalized(candidate, match, null));
                 }
@@ -492,7 +492,7 @@ public class MutationMention {
                 continue;
 
             if (wtResidue.equals(hgvs.getMutation()) == false || mutResidue.equals(hgvs.getWildtype()) == false)
-                continue;           
+                continue;
 
             if(Integer.toString(loc - 1).equals(hgvs.getLocation()) == false && Integer.toString(loc + 1).equals(hgvs.getLocation()) == false)
                 continue;
