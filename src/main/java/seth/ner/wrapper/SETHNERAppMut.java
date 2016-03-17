@@ -13,13 +13,14 @@ import java.util.List;
 
 public class SETHNERAppMut {
     public static void main(String[] args) {
-        System.out.println(args[0]);
-        SETH seth = new SETH("resources/mutations.txt", true, true);
+        String text = args[0];
+        String mutregexfile = (args.length > 2) ? args[1] : "resources/mutations.txt";
+        
+        SETH seth = new SETH(mutregexfile, true, true);
 
-        List<MutationMention> result = seth.findMutations(args[0]);
+        List<MutationMention> result = seth.findMutations(text);
         for (MutationMention mutation : result) {
-            System.out.println(mutation);
+            System.out.println(mutation.toBratFormat());
         }
-        System.out.println("Extracted " + result.size() + " mutations.");
     }
 }
