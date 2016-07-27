@@ -7,6 +7,8 @@ import java.util.List;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -93,10 +95,18 @@ public class SETHNERAppMut {
       String response = singleton.apply(text);
       System.out.println(response);
 
-      t.sendResponseHeaders(200, response.length());
-      OutputStream os = t.getResponseBody();
-      os.write(response.getBytes());
-      os.close();
+      String ENCODING = "UTF-8";
+
+      t.getResponseHeaders().set("Content-Type", "text/plain; charset=" + ENCODING);
+      t.sendResponseHeaders(200, 0);
+
+      Writer out = new OutputStreamWriter(t.getResponseBody(), ENCODING);
+      out.write(response);
+      out.close();
+
+      // OutputStream os = t.getResponseBody();
+      // os.write(response.getBytes());
+      // os.close();
     }
   }
 
