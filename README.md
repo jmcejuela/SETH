@@ -13,7 +13,9 @@ The relevant modifications were done to the file [SETHNERAppMut](https://github.
 
 For simplification, add the generated jar temporallily to your CLASSPATH, as in:
 
+```shell
 CLASSPATH=$CLASSPATH:${SETH_FOLDER}/target/seth-1.3-Snapshot-juanmirocks-jar-with-dependencies.jar
+```
 
 
 ## Run
